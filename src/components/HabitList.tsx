@@ -1,3 +1,4 @@
+import { id } from "date-fns/locale"
 import Button from "./Button"
 import { eachDayOfInterval, endOfWeek, format, isFuture, isPast, startOfWeek } from "date-fns"
 
@@ -7,17 +8,22 @@ export type Habit = {
 }
 
 type HabitListProps = {
-    habits: Habit[]
+    habits: Habit[],
+    deleteHabit : (id: string) => void
 }
 
-export function HabitList({habits}: HabitListProps) {
+export function HabitList({habits, deleteHabit}: HabitListProps) {
     // const habits = [{id:'1', name:'Hi'}];
 
     return (habits.length === 0) ? (<p className="text-center text-zinc-500 py-12">
         No habits yet. Add one above to get started!
     </p>) : (
         <div className="">
-            {habits.map(habit => (<HabitItem key={habit.id} habit={habit}></HabitItem>))}
+            {habits.map(habit => (
+                <HabitItem deleteHabit={deleteHabit} 
+                key={habit.id} habit={habit}></HabitItem>)
+                )
+            }
         </div>
     )
 }
@@ -27,10 +33,11 @@ type HabitItemProps = {
     //     id: string,
     //     name : string
     // }
-    habit : Habit
+    habit : Habit,
+    deleteHabit: (id: string) => void
 }
 
-function HabitItem({habit}: HabitItemProps) {
+function HabitItem({habit, deleteHabit}: HabitItemProps) {
     const visibleDates = eachDayOfInterval({ start: startOfWeek(new Date(), {weekStartsOn : 1}), end: endOfWeek(new Date(), { weekStartsOn: 1})})
     return (
             <div className="rounded-xl bg-zinc-800 p-4 flex flex-col gap-3">
@@ -39,7 +46,13 @@ function HabitItem({habit}: HabitItemProps) {
                         <span className="font-medium">{habit.name}</span>
                         <span className="text-sm text-amber-400">🔥 3</span>
                     </div>
-                    <Button variant="gost-destructive" className="text-sm">Delete</Button>
+                    <Button 
+                        onClick={() => deleteHabit(habit.id)} 
+                        variant="gost-destructive" 
+                        className="text-sm"
+                    >
+                        Delete
+                    </Button>
                 </div>
                 <div className="flex gap-1.5">
                     {visibleDates.map(date => (
